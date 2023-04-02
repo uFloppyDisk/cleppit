@@ -1,26 +1,68 @@
-import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
 import { __PROD__ } from "./constants";
+
+import "reflect-metadata";
+
+import { MikroORM } from "@mikro-orm/core";
 import mikroOrmConfig from "./mikro-orm.config";
+
 import express from "express";
-import { ApolloServer } from 'apollo-server-express'
+import session from 'express-session';
+
+import { ApolloServer } from 'apollo-server-express';
+
 import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 
+import { createClient } from 'redis';
+import RedisStore from "connect-redis";
+
+declare module 'express-session' {
+    export interface SessionData {
+        userid: number
+    }
+}
 
 const main = async () => {
     const orm = await MikroORM.init(mikroOrmConfig);
     await orm.getMigrator().up();
-    
+
     const app = express();
+
+    let redisClient = createClient()
+    redisClient.connect().catch(console.error)
+
+    let redisStore = new RedisStore({
+        client: redisClient,
+        prefix: "cleppit:",
+        disableTouch: true,
+    })
+
+    app.use(
+        session({
+            secret: 'geaspomhkaeo5ruyj-[sj',
+
+            name: 'qid',
+            store: redisStore,
+
+            cookie: {
+                maxAge: (1000 * 60) * 60 * 24, // 24 hours
+                httpOnly: true,
+                sameSite: 'lax', // CSRF
+                secure: __PROD__,
+            },
+
+            resave: false,
+            saveUninitialized: false,
+        })
+    )
+        
     const apollo = new ApolloServer({
         schema: await buildSchema({
             resolvers: [PostResolver, UserResolver],
             validate: false,
         }),
-        context: () => ({ em: orm.em }),
+        context: ({req, res}) => ({ em: orm.em, req, res }),
     })
 
     await apollo.start();
