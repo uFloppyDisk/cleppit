@@ -3,6 +3,7 @@ import { __PROD__ } from "./constants";
 import { Post } from "./entities/Post";
 
 import { MikroORM } from "@mikro-orm/core";
+import { User } from "./entities/User";
 
 export default {
     debug: !__PROD__,
@@ -14,7 +15,7 @@ export default {
 
     dbName: 'cleppit',
 
-    entities: [Post],
+    entities: [Post, User],
 
     migrations: {
         path: path.join(__dirname, './migrations'),
