@@ -28,7 +28,7 @@
             },
             "presentation": {
                 "group": "server"
-            },
+            }
         },
         {
             "path": "./server",
@@ -53,8 +53,9 @@
             "dependsOn": [
                 "Run Backend Watcher",
                 "Run Backend Dev Server",
-                "Run Frontend Dev Server",
-            ]
+                "Run Frontend Dev Server"
+            ],
+            "problemMatcher": []
         }
     ]
 }
