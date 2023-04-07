@@ -40,9 +40,27 @@ const main = async () => {
         disableTouch: true,
     });
 
+    const whitelist = [
+        'http://localhost:3000', 
+        'https://studio.apollographql.com'
+    ];
     app.use(
         cors({
-            origin: 'http://localhost:3000',
+            origin: function (origin, callback) {
+                if (!__PROD__) {
+                    return callback(null, true);
+                }
+
+                if (!(!!origin)) {
+                    console.log(origin);
+                    console.log(!!origin);
+                    callback(new Error('Origin server is not specified.'));
+                } else if (whitelist.indexOf(origin) === -1) {
+                    callback(new Error('Origin is not whitelisted for CORS.'));
+                }
+
+                callback(null, true);
+            },
             credentials: true,
         })
     );
