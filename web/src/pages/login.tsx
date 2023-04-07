@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
-import { useQuery } from 'urql';
+import { useMutation } from 'urql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
 import { LoginDocument } from '../generated/graphql/graphql';
@@ -18,19 +18,19 @@ import { LoginDocument } from '../generated/graphql/graphql';
 interface loginProps {}
 
 export const Login: React.FC<loginProps> = ({}) => {
-    // const router = useRouter();
-    const [, doRegister] = useQuery(LoginDocument);
+    const router = useRouter();
+    const [, doLogin] = useMutation(LoginDocument);
     return (
         <Wrapper variant='small'>
             <Formik
                 initialValues={{ username: '', password: '' }}
-                onSubmit={async (values, {setErrors}) => {
-                    // const response = await doRegister(values);
-                    // if (response.data?.register.errors) {
-                    //     setErrors(toErrorMap(response.data.register.errors));
-                    // } else if (response.data?.register.user) {
-                    //     router.push('/');
-                    // }
+                onSubmit={async (values, { setErrors }) => {
+                    const response = await doLogin({ options: values });
+                    if (response.data?.login.errors) {
+                        setErrors(toErrorMap(response.data.login.errors));
+                    } else if (response.data?.login.user) {
+                        router.push('/');
+                    }
                 }}>
                 {({ values, isSubmitting, handleChange }) => (
                     <Form>
@@ -53,7 +53,7 @@ export const Login: React.FC<loginProps> = ({}) => {
                             isLoading={isSubmitting}
                             bgColor={'teal'}
                             color={'white'}>
-                            Register
+                            Login
                         </Button>
                     </Form>
                 )}

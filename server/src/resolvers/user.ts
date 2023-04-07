@@ -66,7 +66,7 @@ export class UserResolver {
         return em.findOne(User, { id });
     }
 
-    @Query(() => UserResponse)
+    @Mutation(() => UserResponse)
     async login(
         @Arg('options') options: UsernamePasswordInput,
         @Ctx() { em, req }: MyContext
