@@ -52,8 +52,6 @@ const main = async () => {
                 }
 
                 if (!(!!origin)) {
-                    console.log(origin);
-                    console.log(!!origin);
                     callback(new Error('Origin server is not specified.'));
                 } else if (whitelist.indexOf(origin) === -1) {
                     callback(new Error('Origin is not whitelisted for CORS.'));
